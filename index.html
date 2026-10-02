@@ -1,297 +1,838 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="da">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Boligkøbs-Beregnings & Huskeliste for Tania, André & Berta</title>
-    <style>
-        :root {
-            --primary: #2c3e50;
-            --secondary: #3498db;
-            --accent: #e74c3c;
-            --bg: #f8f9fa;
-            --card-bg: #ffffff;
-            --text: #333333;
-            --border: #ddd;
-        }
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--bg);
-            color: var(--text);
-            margin: 0;
-            padding: 20px;
-            line-height: 1.6;
-        }
-        .container {
-            max-width: 900px;
-            margin: 0 auto;
-        }
-        header {
-            text-align: center;
-            background: var(--primary);
-            color: white;
-            padding: 30px;
-            border-radius: 10px;
-            margin-bottom: 25px;
-        }
-        header h1 {
-            margin: 0 0 10px 0;
-            font-size: 1.8rem;
-        }
-        header p {
-            margin: 0;
-            opacity: 0.9;
-        }
-        .card {
-            background: var(--card-bg);
-            border-radius: 10px;
-            padding: 25px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-            margin-bottom: 25px;
-        }
-        h2 {
-            color: var(--primary);
-            border-bottom: 2px solid var(--secondary);
-            padding-bottom: 8px;
-            margin-top: 0;
-            font-size: 1.3rem;
-        }
-        .form-group {
-            margin-bottom: 15px;
-        }
-        label {
-            display: block;
-            font-weight: 600;
-            margin-bottom: 5px;
-        }
-        input, select {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            font-size: 1rem;
-            box-sizing: border-box;
-        }
-        .grid-2 {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-        }
-        @media (max-width: 600px) {
-            .grid-2 { grid-template-columns: 1fr; }
-        }
-        .result-box {
-            background: #eef2f7;
-            padding: 15px;
-            border-radius: 6px;
-            margin-top: 15px;
-        }
-        .result-row {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 8px;
-        }
-        .result-row.total {
-            font-weight: bold;
-            border-top: 1px solid var(--border);
-            padding-top: 8px;
-            font-size: 1.1rem;
-            color: var(--primary);
-        }
-        ul.checklist {
-            list-style: none;
-            padding: 0;
-        }
-        ul.checklist li {
-            padding: 10px 0;
-            border-bottom: 1px solid #eee;
-            display: flex;
-            align-items: center;
-        }
-        ul.checklist input[type="checkbox"] {
-            width: 20px;
-            height: 20px;
-            margin-right: 15px;
-            cursor: pointer;
-        }
-        ul.checklist label {
-            cursor: pointer;
-            font-weight: normal;
-            margin-bottom: 0;
-        }
-        ul.checklist label.done {
-            text-decoration: line-through;
-            color: #888;
-        }
-        .info-box {
-            background: #fff8e1;
-            border-left: 4px solid #ffc107;
-            padding: 12px;
-            border-radius: 4px;
-            font-size: 0.95rem;
-            margin-bottom: 15px;
-        }
-    </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<title>Tania, André & Bertas boligkøb</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Young+Serif&family=Figtree:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: én rolig spalte (maks 880px) med faner øverst; hvert faneblad er et lille "ark" med forklaring først og tal bagefter. */
+:root{
+  --bg:#f3ecdf; --surface:#fbf7ef; --sunk:#eadfcc; --ink:#2e2a22; --muted:#6c6353; --line:#d9ccb4;
+  --accent:#3d5a4c; --accent-ink:#fbf7ef; --warm:#b5803f; --sand:#cdb98f; --good:#2f6b4a; --warn:#a2501f;
+  --display:"Young Serif",Georgia,"Times New Roman",serif;
+  --body:"Figtree",system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#1f1b16; --surface:#2a251e; --sunk:#171411; --ink:#efe6d6; --muted:#aa9f8b; --line:#43392c;
+  --accent:#93bda4; --accent-ink:#15201a; --warm:#d6a868; --sand:#7d6e50; --good:#8fcba6; --warn:#e79a6a; color-scheme:dark } }
+:root[data-theme="dark"]{
+  --bg:#1f1b16; --surface:#2a251e; --sunk:#171411; --ink:#efe6d6; --muted:#aa9f8b; --line:#43392c;
+  --accent:#93bda4; --accent-ink:#15201a; --warm:#d6a868; --sand:#7d6e50; --good:#8fcba6; --warn:#e79a6a; color-scheme:dark }
+
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.55;font-variant-numeric:tabular-nums}
+.wrap{max-width:880px;margin:0 auto;padding-inline:16px;padding-block:20px 64px}
+h1,h2,h3{font-family:var(--display);font-weight:400;line-height:1.2;text-wrap:balance;margin:0}
+h1{font-size:clamp(1.6rem,5vw,2.2rem)}
+h2{font-size:1.45rem}
+h3{font-size:1.1rem}
+p{margin:0;max-width:65ch}
+.muted{color:var(--muted)}
+.small{font-size:.875rem}
+.top{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:baseline;justify-content:space-between;margin-bottom:12px}
+.sync{font-size:.8rem;color:var(--muted);border:1px solid var(--line);border-radius:99px;padding:2px 10px;background:var(--surface)}
+nav{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);margin-inline:-16px;padding:8px 16px;border-bottom:1px solid var(--line)}
+.tabs{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tabs button{flex:none;font:inherit;font-size:.92rem;font-weight:600;color:var(--muted);background:transparent;border:1px solid transparent;border-radius:99px;padding:6px 13px;cursor:pointer}
+.tabs button[aria-selected="true"]{background:var(--accent);color:var(--accent-ink)}
+.tabs button:hover:not([aria-selected="true"]){border-color:var(--line);color:var(--ink)}
+button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible,summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+section.tab{display:flex;flex-direction:column;gap:20px;padding-top:24px}
+.lead{font-size:1.05rem;color:var(--muted)}
+.sheet{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:18px;display:flex;flex-direction:column;gap:14px;min-width:0}
+.grid{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}
+.fld{display:flex;flex-direction:column;gap:4px;font-size:.85rem;color:var(--muted);font-weight:600;min-width:0}
+.inp{display:flex;align-items:center;background:var(--bg);border:1px solid var(--line);border-radius:9px;padding-right:10px}
+.inp input{flex:1;min-width:0;width:100%;font:inherit;font-weight:600;color:var(--ink);background:transparent;border:0;padding:9px 10px;text-align:right}
+.inp input:focus{outline:none}
+.inp:focus-within{border-color:var(--accent)}
+.inp i{font-style:normal;color:var(--muted);font-weight:500;font-size:.85rem;white-space:nowrap}
+input.txt,select,textarea{font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:9px;padding:9px 10px;width:100%}
+textarea{min-height:220px;resize:vertical;line-height:1.5}
+.btn{font:inherit;font-weight:600;font-size:.9rem;border-radius:9px;padding:8px 14px;cursor:pointer;border:1px solid var(--accent);background:var(--accent);color:var(--accent-ink)}
+.btn.ghost{background:transparent;color:var(--accent)}
+.btn.quiet{border-color:var(--line);background:transparent;color:var(--muted);font-weight:500;padding:5px 10px;font-size:.82rem}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.bar{display:flex;height:34px;border-radius:9px;overflow:hidden;border:1px solid var(--line)}
+.bar span{min-width:2px}
+.seg-own{background:var(--accent)} .seg-bank{background:var(--warm)} .seg-rk{background:var(--sand)}
+.legend{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(180px,1fr))}
+.legend div{display:flex;flex-direction:column;gap:1px;font-size:.85rem;color:var(--muted)}
+.legend b{font-size:1.15rem;color:var(--ink);font-weight:700}
+.dot{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px}
+.big{font-family:var(--display);font-size:1.7rem;line-height:1.1}
+.sums{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
+.sum{background:var(--sunk);border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:4px}
+.sum span{font-size:.85rem;color:var(--muted);font-weight:600}
+.lines{display:flex;flex-direction:column}
+.line{display:grid;grid-template-columns:minmax(0,1fr) 150px auto;gap:4px 12px;align-items:center;padding:10px 0;border-top:1px solid var(--line)}
+.line:first-child{border-top:0}
+.line .nm{font-weight:600}
+.line .hp{grid-column:1/-1;font-size:.84rem;color:var(--muted);max-width:60ch}
+.line .x{width:28px}
+.auto{display:inline-block;font-size:.72rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--accent);border:1px solid var(--accent);border-radius:99px;padding:0 8px;margin-left:4px;vertical-align:middle;white-space:nowrap}
+.total{display:flex;justify-content:space-between;gap:12px;align-items:baseline;border-top:2px solid var(--ink);padding-top:10px;font-weight:700}
+.note{background:var(--sunk);border-radius:10px;padding:12px 14px;font-size:.92rem}
+.note.warn{color:var(--warn);font-weight:600}
+.tblwrap{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:.93rem}
+th,td{text-align:left;padding:9px 10px;border-top:1px solid var(--line);vertical-align:top}
+thead th{border-top:0;font-size:.78rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+td.n,th.n{text-align:right;white-space:nowrap}
+.types{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
+.type{border:1px solid var(--line);border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:6px;background:var(--bg)}
+.type .tag{font-size:.78rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--accent)}
+.type ul,.plain{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:4px;font-size:.92rem}
+.scen{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
+.sc{border:1px solid var(--line);border-radius:12px;padding:14px;background:var(--bg);display:flex;flex-direction:column;gap:10px;min-width:0}
+.sc.best{border-color:var(--good);box-shadow:inset 0 0 0 1px var(--good)}
+.sc .f2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.badge{align-self:flex-start;font-size:.78rem;font-weight:700;border-radius:99px;padding:2px 10px;background:var(--sunk);color:var(--warn)}
+.badge.best{color:var(--good)}
+.kv{display:flex;justify-content:space-between;gap:10px;font-size:.9rem;padding:3px 0}
+.kv b{white-space:nowrap}
+.kv.main{font-size:1rem;border-bottom:1px solid var(--line);padding-bottom:7px;margin-bottom:3px}
+.kv.main b{font-family:var(--display);font-weight:400;font-size:1.35rem}
+input[type=range]{width:100%;accent-color:var(--accent)}
+.chk{display:flex;flex-direction:column}
+.chk label{display:flex;gap:12px;align-items:flex-start;padding:10px 0;border-top:1px solid var(--line);cursor:pointer}
+.chk label:first-child{border-top:0}
+.chk input{width:20px;height:20px;margin-top:2px;accent-color:var(--accent);flex:none}
+.chk input:checked+span{color:var(--muted);text-decoration:line-through}
+.chk span{flex:1;min-width:0}
+.prog{height:8px;border-radius:99px;background:var(--sunk);overflow:hidden}
+.prog i{display:block;height:100%;background:var(--accent);width:0}
+dl{margin:0;display:grid;grid-template-columns:minmax(90px,150px) minmax(0,1fr);gap:8px 14px;font-size:.93rem}
+dt{font-weight:700} dd{margin:0;color:var(--muted)}
+.two{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(250px,1fr))}
+@media (max-width:480px){ .line{grid-template-columns:minmax(0,1fr) 122px auto} dl{grid-template-columns:1fr} dd{margin-bottom:6px} }
+@media (prefers-reduced-motion:no-preference){ .prog i,.bar span{transition:width .25s} }
+</style>
+<style>
+html{-webkit-text-size-adjust:100%}
+:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+body{margin:0}
+img{max-width:100%}
+</style>
 </head>
 <body>
+<div class="wrap">
+  <div class="top">
+    <h1>Tania, André &amp; Bertas boligkøb</h1>
+    <span class="sync" id="sync">Gemmer på denne enhed</span>
+  </div>
 
-<div class="container">
-    <header>
-        <h1>Lejlighedskøb: Guide, Låneberegner & Huskeliste</h1>
-        <p>Lavet til Tania, André & lille Berta 🏡</p>
-    </header>
+  <nav><div class="tabs" role="tablist" id="tabs">
+    <button data-tab="overblik">Overblik</button>
+    <button data-tab="omkostninger">Omkostninger</button>
+    <button data-tab="laan">Lånetyper</button>
+    <button data-tab="beregner">Sammenlign lån</button>
+    <button data-tab="kurs">Kurs &amp; konvertering</button>
+    <button data-tab="ejer">Forening, forsikring &amp; skat</button>
+    <button data-tab="huskeliste">Huskeliste</button>
+    <button data-tab="noter">Noter</button>
+  </div></nav>
 
-    <!-- 1. BOLIGKØB & LÅNEBEREGNER -->
-    <div class="card">
-        <h2>1. Bolig- og Låneberegner</h2>
-        <div class="info-box">
-            Indtast boligens pris for at se fordelingen mellem egen udbetaling (5%), banklån (15%), realkreditlån (80%) samt månedlige udgifter for forskellige lånetyper.
-        </div>
-        
-        <div class="grid-2">
-            <div class="form-group">
-                <label for="price">Købesum (kr.):</label>
-                <input type="number" id="price" value="2500000" step="50000" oninput="calculate()">
-            </div>
-            <div class="form-group">
-                <label for="interestType">Vælg låntype til sammenligning:</label>
-                <select id="interestType" onchange="calculate()">
-                    <option value="fkort">F-kort / F1 (Lav rente, variabel ~2.4%)</option>
-                    <option value="f5">F5-lån (Fast i 5 år ~3.0%)</option>
-                    <option value="fast">Fastforrentet (30 år, 4.0%)</option>
-                </select>
-            </div>
-        </div>
+  <!-- OVERBLIK -->
+  <section class="tab" id="t-overblik">
+    <p class="lead">Skriv prisen på lejligheden, så regner siden resten ud. Alle tal er eksempler, indtil I retter dem. I kan ændre alt.</p>
 
-        <div class="result-box">
-            <h3>Finansieringsstruktur:</h3>
-            <div class="result-row">
-                <span>Egen udbetaling (5%):</span>
-                <span id="resUdbetaling">125.000 kr.</span>
-            </div>
-            <div class="result-row">
-                <span>Banklån (15%):</span>
-                <span id="resBanklaan">375.000 kr.</span>
-            </div>
-            <div class="result-row">
-                <span>Realkreditlån (80%):</span>
-                <span id="resRealkredit">2.000.000 kr.</span>
-            </div>
-            <div class="result-row total">
-                <span>Estimeret månedlig ydelse (efter skat):</span>
-                <span id="resMaaned">0 kr.</span>
-            </div>
+    <div class="sheet">
+      <h2>Sådan betales en lejlighed</h2>
+      <p>Man betaler næsten aldrig det hele selv. Købet deles i tre: lidt opsparing, et banklån og et stort realkreditlån.</p>
+      <div class="grid">
+        <label class="fld">Lejlighedens pris<span class="inp"><input id="price" data-bind="price" data-kind="kr" inputmode="numeric"><i>kr.</i></span></label>
+        <label class="fld">Husstandens årsindkomst før skat<span class="inp"><input id="income" data-bind="income" data-kind="kr" inputmode="numeric"><i>kr.</i></span></label>
+      </div>
+      <div class="bar" aria-hidden="true"><span class="seg-own" id="b-own"></span><span class="seg-bank" id="b-bank"></span><span class="seg-rk" id="b-rk"></span></div>
+      <div class="grid">
+        <div class="fld"><span><span class="dot seg-own"></span>I betaler selv (udbetaling)</span>
+          <span class="inp"><input id="downPct" data-bind="downPct" data-kind="pct" inputmode="decimal"><i>%</i></span>
+          <span class="inp"><input id="downKr" data-bind="downKr" data-kind="kr" inputmode="numeric"><i>kr.</i></span>
         </div>
+        <div class="fld"><span><span class="dot seg-bank"></span>Banklån</span>
+          <span class="inp"><input id="bankPct" data-bind="bankPct" data-kind="pct" inputmode="decimal"><i>%</i></span>
+          <span class="inp"><input id="bankKr" data-bind="bankKr" data-kind="kr" inputmode="numeric"><i>kr.</i></span>
+        </div>
+        <div class="fld"><span><span class="dot seg-rk"></span>Realkreditlån (resten)</span>
+          <span class="inp"><input id="rkPct" disabled><i>%</i></span>
+          <span class="inp"><input id="rkKr" disabled><i>kr.</i></span>
+        </div>
+      </div>
+      <div id="splitNote"></div>
+      <dl>
+        <dt>Udbetaling</dt><dd>Jeres egne penge. Loven kræver mindst 5 % af prisen.</dd>
+        <dt>Banklån</dt><dd>Dækker hullet mellem udbetalingen og realkreditlånet. Dyrere rente, og det betales typisk af på 10 til 20 år.</dd>
+        <dt>Realkreditlån</dt><dd>Det store, billige lån. Må højst være 80 % af prisen og løber normalt i 30 år.</dd>
+      </dl>
     </div>
 
-    <!-- 2. HUSKELISTE MED GEMMEFUNKTION -->
-    <div class="card">
-        <h2>2. Fælles Huskeliste (Gemmer automatisk på enheden)</h2>
-        <p style="font-size: 0.9rem; color: #666;">Afkryds emnerne efterhånden som I kommer igennem processen. Det huskes automatisk, selv hvis I lukker siden.</p>
-        
-        <ul class="checklist" id="checklist">
-            <li>
-                <input type="checkbox" id="check1" onchange="saveChecklist()">
-                <label for="check1" id="label1">Få et godkendt lånebevis fra banken</label>
-            </li>
-            <li>
-                <input type="checkbox" id="check2" onchange="saveChecklist()">
-                <label for="check2" id="label2">Gennemse salgsopstilling og energimærke</label>
-            </li>
-            <li>
-                <input type="checkbox" id="check3" onchange="saveChecklist()">
-                <label for="check3" id="label3">Tjek ejerforeningens vedtægter og seneste regnskab</label>
-            </li>
-            <li>
-                <input type="checkbox" id="check4" onchange="saveChecklist()">
-                <label for="check4" id="label4">Få en køberrådgiver / advokat til at godkende købsaftalen</label>
-            </li>
-            <li>
-                <input type="checkbox" id="check5" onchange="saveChecklist()">
-                <label for="check5" id="label5">Opret/opdater indboforsikring og tjek ejerforeningens bygningsforsikring</label>
-            </li>
-            <li>
-                <input type="checkbox" id="check6" onchange="saveChecklist()">
-                <label for="check6" id="label6">Tinglysning af skøde og pantebreve</label>
-            </li>
-        </ul>
+    <div class="sums">
+      <div class="sum"><span>Penge I skal have klar</span><b class="big" id="o-cash"></b><span class="small muted" id="o-cash2"></span></div>
+      <div class="sum"><span>Pr. måned i alt</span><b class="big" id="o-month"></b><span class="small muted" id="o-month2"></span></div>
+      <div class="sum"><span>Gæld i forhold til indkomst</span><b class="big" id="o-gf"></b><span class="small muted" id="o-gf2"></span></div>
     </div>
 
-    <!-- 3. FORKLARINGER -->
-    <div class="card">
-        <h2>3. Hurtig guide til lån og udgifter</h2>
-        <p><strong>Hvordan hænger lånene sammen?</strong></p>
-        <ul>
-            <li><strong>Udbetaling (5%):</strong> Skal betales kontant af egen lomme.</li>
-            <li><strong>Realkreditlån (80%):</strong> Danmarks billigste lån, der optages gennem et realkreditinstitut mod pant i lejligheden.</li>
-            <li><strong>Banklån (15%):</strong> Dækker det resterende beløb mellem udbetaling og realkreditlån. Har en kortere afdragstid og en højere rente.</li>
-        </ul>
-        <p><strong>Forskellen på at bo til leje vs. eje:</strong></p>
-        <ul>
-            <li><strong>Fællesudgifter:</strong> Som ejer betaler man hver måned til en ejerforening, som dækker udvendig vedligehold og bygningsforsikring.</li>
-            <li><strong>Vedligeholdelse:</strong> Går vandhanen i stykker, betaler man selv regningen (modsat lejebolig, hvor udlejer ordner det). Til gengæld går afdragene på lånet til jeres egen opsparing!</li>
-        </ul>
+    <div class="sheet">
+      <h3>Banklånet</h3>
+      <div class="grid">
+        <label class="fld">Rente på banklån<span class="inp"><input id="bankRate" data-bind="bankRate" data-kind="pct" inputmode="decimal"><i>% om året</i></span></label>
+        <label class="fld">Betales af over<span class="inp"><input id="bankYears" data-bind="bankYears" data-kind="pct" inputmode="numeric"><i>år</i></span></label>
+        <label class="fld">Skatteværdi af rentefradrag<span class="inp"><input id="tax" data-bind="tax" data-kind="pct" inputmode="decimal"><i>%</i></span></label>
+      </div>
+      <p class="small muted">Rentefradrag betyder, at I får cirka en tredjedel af jeres renteudgifter tilbage i skat. Derfor viser siden både tal før og efter skat.</p>
     </div>
+  </section>
+
+  <!-- OMKOSTNINGER -->
+  <section class="tab" id="t-omkostninger" hidden>
+    <p class="lead">To slags udgifter: dem I betaler én gang, når I køber, og dem der kommer hver måned bagefter.</p>
+    <div class="sheet">
+      <h2>Én gang, når I køber</h2>
+      <p class="note"><b>Alle beløb her er kun eksempler.</b> Linjer mærket "Beregnes automatisk" regnes ud fra købsprisen og lånene på Overblik og ændrer sig, når I retter prisen: tinglysning af skøde, tinglysning af realkreditlån og bankens pant, gebyrer til realkreditinstituttet og oprettelse af banklån. De øvrige er typiske priser, som I selv retter, når I får rigtige tilbud. Retter I et automatisk beløb, gælder jeres tal, og pilen ↺ henter beregningen tilbage.</p>
+      <div class="lines" id="oneList"></div>
+      <div class="row"><button class="btn ghost" data-add="one">+ Tilføj egen udgift</button></div>
+      <div class="total"><span>Købsomkostninger i alt</span><span id="oneTotal"></span></div>
+      <div class="total" style="border-top:0;padding-top:0"><span>Plus udbetaling</span><span id="oneDown"></span></div>
+      <div class="total"><span>Penge I skal have klar</span><span id="oneAll"></span></div>
+    </div>
+    <div class="sheet">
+      <h2>Hver måned, ud over lånet</h2>
+      <p class="note"><b>Også her er beløbene kun eksempler.</b> Kun ejendomsværdiskatten beregnes automatisk ud fra købsprisen. Resten er typiske tal. Find de rigtige i salgsopstillingen under "ejerudgifter", og spørg sælger om forbruget.</p>
+      <div class="lines" id="monList"></div>
+      <div class="row"><button class="btn ghost" data-add="mon">+ Tilføj egen udgift</button></div>
+      <div class="total"><span>Faste udgifter pr. måned</span><span id="monTotal"></span></div>
+    </div>
+  </section>
+
+  <!-- LÅNETYPER -->
+  <section class="tab" id="t-laan" hidden>
+    <p class="lead">Alle realkreditlån virker ens: I låner et beløb og betaler lidt tilbage hver måned. Forskellen er, hvor længe renten er låst fast.</p>
+    <div class="sheet">
+      <h2>De fem typer</h2>
+      <div class="types">
+        <div class="type"><span class="tag">Fast rente</span><h3>Samme rente i 30 år</h3>
+          <p class="small">I kender jeres betaling hele vejen. Renten er højere fra start, fordi I betaler for trygheden.</p>
+          <ul><li>Godt, hvis budgettet er stramt</li><li>Kan lægges om, hvis renten ændrer sig meget</li><li>Dyrest her og nu</li></ul></div>
+        <div class="type"><span class="tag">F5</span><h3>Fast i 5 år ad gangen</h3>
+          <p class="small">Renten er låst i fem år. Derefter får I den rente, der gælder til den tid, i fem nye år.</p>
+          <ul><li>Lidt lavere rente end fast</li><li>Ro i fem år</li><li>Kan stige eller falde ved hvert skift</li></ul></div>
+        <div class="type"><span class="tag">F3</span><h3>Fast i 3 år ad gangen</h3>
+          <p class="small">Som F5, men renten skifter hvert tredje år.</p>
+          <ul><li>Mellemting mellem F1 og F5</li><li>Oftere skift betyder mere usikkerhed</li></ul></div>
+        <div class="type"><span class="tag">F1</span><h3>Ny rente hvert år</h3>
+          <p class="small">Renten sættes på ny hvert år. I mærker hurtigt, når renten ændrer sig.</p>
+          <ul><li>Følger markedet tæt</li><li>Højt bidrag hos de fleste institutter</li></ul></div>
+        <div class="type"><span class="tag">F-kort</span><h3>Ny rente hvert halve år</h3>
+          <p class="small">Den mest variable. Renten følger de korte markedsrenter og ændres to gange om året.</p>
+          <ul><li>Ofte lavest rente lige nu</li><li>Størst risiko for udsving</li><li>Kræver luft i budgettet</li></ul></div>
+      </div>
+      <p class="note">"F" står for rentetilpasning. Tallet efter F er antal år, renten er låst. Jo kortere tid, jo lavere rente i dag, og jo større risiko senere.</p>
+    </div>
+
+    <div class="sheet">
+      <h2>Dagens renter</h2>
+      <p class="small muted" id="rateStamp"></p>
+      <div class="tblwrap"><table><thead><tr><th>Lån</th><th class="n">Rente</th><th class="n">Kurs</th><th class="n">Typisk bidrag</th></tr></thead><tbody id="rateRows"></tbody></table></div>
+      <p class="small muted">Tallene er vejledende og varierer mellem institutterne. Brug dem til at sammenligne, og bed banken om et konkret tilbud før I beslutter jer. Nye lån i "Sammenlign lån" starter med disse tal.</p>
+    </div>
+
+    <div class="sheet">
+      <h2>Ord I vil møde</h2>
+      <dl>
+        <dt>Ydelse</dt><dd>Det I betaler hver måned. Består af rente, bidrag og afdrag.</dd>
+        <dt>Rente</dt><dd>Prisen for at låne pengene.</dd>
+        <dt>Bidrag</dt><dd>Et gebyr til realkreditinstituttet, regnet i procent af gælden. Det er en ren udgift ligesom renten.</dd>
+        <dt>Afdrag</dt><dd>Den del, der gør gælden mindre. Det er jeres egen opsparing i boligen.</dd>
+        <dt>Afdragsfrihed</dt><dd>Op til 10 år, hvor I kun betaler rente og bidrag. Lavere betaling, men gælden bliver ikke mindre.</dd>
+        <dt>Hovedstol</dt><dd>Det beløb, I skylder fra start.</dd>
+        <dt>Restgæld</dt><dd>Det, I skylder lige nu.</dd>
+        <dt>Kurs</dt><dd>Hvor mange kroner I får udbetalt for hver 100 kr., I kommer til at skylde. Se fanen Kurs &amp; konvertering.</dd>
+        <dt>Lånebevis</dt><dd>Bankens skriftlige ord for, hvor dyrt I må købe. Få det, før I byder.</dd>
+        <dt>ÅOP</dt><dd>Årlige omkostninger i procent. Samler rente og gebyrer i ét tal, så tilbud kan sammenlignes.</dd>
+      </dl>
+    </div>
+
+    <div class="sheet">
+      <h3>Regel, der kan begrænse jeres valg</h3>
+      <p>Hvis jeres samlede gæld er over 4 gange årsindkomsten, og I låner mere end 60 % af boligens værdi, må I ikke vælge F-kort, F1 eller F3. I skal have mindst 5 års fast rente, og afdragsfrihed er kun muligt på et 30-årigt lån med fast rente.</p>
+      <p class="note" id="gfNote"></p>
+    </div>
+  </section>
+
+  <!-- BEREGNER -->
+  <section class="tab" id="t-beregner" hidden>
+    <p class="lead">Lav et kort for hvert lån, I overvejer. Siden regner betalingen ud og viser, hvor meget dyrere hvert lån er end det billigste. Alt gemmes automatisk.</p>
+    <div class="sheet">
+      <div class="row" style="justify-content:space-between">
+        <h2>Jeres låneforslag</h2>
+        <div class="row">
+          <select id="addType" aria-label="Lånetype" style="width:auto">
+            <option value="fast">Fast rente</option><option value="f5">F5</option><option value="f3">F3</option><option value="f1">F1</option><option value="fkort">F-kort</option>
+          </select>
+          <button class="btn" id="addSc">+ Tilføj lån</button>
+        </div>
+      </div>
+      <p class="small muted" id="scIntro"></p>
+      <div class="scen" id="scen"></div>
+    </div>
+
+    <div class="sheet">
+      <h2>Hvad hvis renten ændrer sig?</h2>
+      <p>Træk i skyderen og se, hvad der sker med betalingen, når renten på de variable lån skal sættes på ny. Lånet med fast rente rører sig ikke.</p>
+      <label class="fld" for="shift"><span id="shiftLbl"></span></label>
+      <input type="range" id="shift" min="-2" max="4" step="0.25" value="1">
+      <div class="tblwrap"><table><thead><tr><th>Lån</th><th class="n">I dag</th><th class="n">Efter ændring</th><th class="n">Forskel pr. md.</th><th>Mærkes</th></tr></thead><tbody id="shiftRows"></tbody></table></div>
+      <p class="small muted">Beløb er før skat og gælder kun realkreditlånet. Banklånets rente er også variabel og følger normalt med.</p>
+    </div>
+  </section>
+
+  <!-- KURS -->
+  <section class="tab" id="t-kurs" hidden>
+    <p class="lead">Kursen er den sværeste del at forstå, så her er den i små bidder.</p>
+    <div class="sheet">
+      <h2>Hvad er kurs?</h2>
+      <p>Realkreditinstituttet har ikke selv pengene. De sælger obligationer for jer, og køberne af obligationerne betaler ikke altid fuld pris. Kursen er prisen pr. 100 kr.</p>
+      <p class="note" id="kursEx"></p>
+      <p>Kursen ændrer sig hver dag. Derfor kan I lave en <b>kurssikring</b> (også kaldet fastkursaftale), når I har valgt lån. Så er kursen låst, til pengene bliver udbetalt.</p>
+    </div>
+    <div class="two">
+      <div class="sheet"><h3>Når renten stiger</h3>
+        <ul class="plain"><li>Kursen på jeres lån falder.</li><li>Variabelt lån: betalingen stiger ved næste renteskift.</li><li>Fast rente: betalingen er uændret, og gælden kan købes tilbage billigere. Det kaldes at opkonvertere.</li></ul></div>
+      <div class="sheet"><h3>Når renten falder</h3>
+        <ul class="plain"><li>Kursen på jeres lån stiger, men I kan altid indfri et fastforrentet lån til kurs 100.</li><li>Variabelt lån: betalingen falder ved næste renteskift.</li><li>Fast rente: I kan skifte til et lån med lavere rente. Det kaldes at nedkonvertere.</li></ul></div>
+    </div>
+    <div class="sheet">
+      <h2>Op- og nedkonvertering</h2>
+      <p>At konvertere betyder at lægge lånet om til et nyt. Det er den store fordel ved fast rente: I har en gevinst uanset hvilken vej renten går.</p>
+      <div class="two">
+        <div class="type"><span class="tag">Nedkonvertering</span><h3>Renten er faldet</h3>
+          <p class="small">I indfrier det gamle lån til kurs 100 og tager et nyt med lavere rente.</p>
+          <ul><li>Fordel: lavere betaling hver måned</li><li>Ulempe: gælden stiger lidt, fordi omlægningen koster</li><li>Tommelfingerregel: renten skal være faldet omkring 1 procentpoint, og gælden bør være over ca. 500.000 kr.</li></ul></div>
+        <div class="type"><span class="tag">Opkonvertering</span><h3>Renten er steget</h3>
+          <p class="small">I køber det gamle lån tilbage til lav kurs og tager et nyt med højere rente.</p>
+          <ul><li>Fordel: gælden bliver mindre</li><li>Ulempe: højere betaling hver måned</li><li>Gevinsten bliver først rigtig, hvis renten falder igen, og I så kan nedkonvertere</li></ul></div>
+      </div>
+      <h3>Prøv selv: hvad koster det at indfri?</h3>
+      <div class="grid">
+        <label class="fld">Restgæld<span class="inp"><input id="kRest" data-bind="kRest" data-kind="kr" inputmode="numeric"><i>kr.</i></span></label>
+        <label class="fld">Kurs i dag<span class="inp"><input id="kKurs" data-bind="kKurs" data-kind="pct" inputmode="decimal"><i>pr. 100</i></span></label>
+        <label class="fld">Omkostninger ved omlægning<span class="inp"><input id="kCost" data-bind="kCost" data-kind="kr" inputmode="numeric"><i>kr.</i></span></label>
+      </div>
+      <p class="note" id="kOut"></p>
+      <p class="small muted">Banken regner gerne på det for jer, og de fleste institutter holder selv øje og giver besked, når en omlægning kan betale sig.</p>
+    </div>
+  </section>
+
+  <!-- EJERFORENING, FORSIKRING, SKAT -->
+  <section class="tab" id="t-ejer" hidden>
+    <p class="lead">Tre ting, der følger med, når man ejer en lejlighed: en forening, nogle forsikringer og to boligskatter.</p>
+    <div class="sheet">
+      <h2>Ejerforeningen</h2>
+      <p>Alle ejere i ejendommen er automatisk med i ejerforeningen. Den passer det fælles, f.eks. tag, facade, opgang og rør, og sender en regning hver måned, som hedder fællesudgifter.</p>
+      <ul class="plain">
+        <li><b>Regnskab og budget:</b> viser, om foreningen har penge i kassen eller gæld.</li>
+        <li><b>Referater fra generalforsamlingen:</b> her står planlagte arbejder og uenigheder.</li>
+        <li><b>Vedligeholdelsesplan:</b> viser, hvad der skal laves de næste 10 år. Store arbejder betyder ekstraregninger eller højere fællesudgifter.</li>
+        <li><b>Vedtægter og husorden:</b> regler for husdyr, udlejning, altaner og ombygning.</li>
+      </ul>
+      <p class="note">Bed jeres køberrådgiver om at læse foreningens papirer. Det er her, de dyre overraskelser gemmer sig.</p>
+    </div>
+    <div class="sheet">
+      <h2>Forsikringer</h2>
+      <dl>
+        <dt>Indbo</dt><dd>Dækker jeres ting ved brand, tyveri og vandskade. Skal I have. Tjek at den dækker glas og sanitet samt rør inde i lejligheden, hvis ejerforeningens forsikring ikke gør. Typisk 150 til 350 kr. om måneden.</dd>
+        <dt>Bygning</dt><dd>Betales gennem fællesudgifterne. I skal ikke tegne den selv.</dd>
+        <dt>Ejerskifte</dt><dd>Bruges mest ved huse. Den kræver en tilstandsrapport, som sjældent laves for lejligheder.</dd>
+        <dt>Liv og kritisk sygdom</dt><dd>Værd at overveje med et lille barn. Sikrer, at den ene kan blive boende, hvis den anden falder fra. Tjek først, hvad I har gennem pension og job.</dd>
+        <dt>Indkomst</dt><dd>Lønsikring eller a-kasse, så I kan betale lånet ved ledighed.</dd>
+      </dl>
+    </div>
+    <div class="sheet">
+      <h2>Skatter på boligen</h2>
+      <dl>
+        <dt>Ejendomsværdiskat</dt><dd>0,51 % om året af 80 % af den offentlige vurdering. Trækkes via forskudsopgørelsen.</dd>
+        <dt>Grundskyld</dt><dd>Skat af jeres andel af grunden. Satsen afhænger af kommunen.</dd>
+        <dt>Rentefradrag</dt><dd>I får ca. 33 % af renter og bidrag tilbage i skat. Husk at rette forskudsopgørelsen, når I har købt.</dd>
+      </dl>
+    </div>
+  </section>
+
+  <!-- HUSKELISTE -->
+  <section class="tab" id="t-huskeliste" hidden>
+    <p class="lead">Sæt kryds efterhånden. Listen følger rækkefølgen i et køb.</p>
+    <div class="sheet"><div class="row" style="justify-content:space-between"><h2>Fremdrift</h2><b id="chkCount"></b></div><div class="prog"><i id="chkBar"></i></div></div>
+    <div id="chkGroups" style="display:flex;flex-direction:column;gap:20px"></div>
+    <div class="sheet">
+      <h3>Egne punkter</h3>
+      <div class="chk" id="chkOwn"></div>
+      <div class="row"><input class="txt" id="newChk" placeholder="Skriv et nyt punkt" style="flex:1;min-width:180px"><button class="btn" id="addChk">Tilføj</button></div>
+    </div>
+  </section>
+
+  <!-- NOTER -->
+  <section class="tab" id="t-noter" hidden>
+    <p class="lead">Plads til det, I ikke må glemme: spørgsmål til banken, lejligheder I har set, tilbud I har fået.</p>
+    <div class="sheet">
+      <h2>Noter</h2>
+      <textarea id="notes" data-bind="notes" placeholder="F.eks. Spørg banken: hvad koster kurssikring? Hvad er bidraget på F5?"></textarea>
+    </div>
+    <div class="sheet" id="shareSheet" hidden>
+      <h2>Del planen mellem jeres enheder</h2>
+      <div id="shareOff" style="display:flex;flex-direction:column;gap:12px">
+        <p>Opret en delt plan, så ser I de samme tal, krydser og noter på alle telefoner og computere. Ændringer følger automatisk med.</p>
+        <div class="row"><button class="btn" id="shareCreate">Opret delt plan</button></div>
+        <p class="small muted">Har I allerede et link fra en anden enhed? Indsæt det her.</p>
+        <div class="row"><input class="txt" id="joinBox" placeholder="Indsæt link" style="flex:1;min-width:180px" aria-label="Link til delt plan"><button class="btn ghost" id="shareJoin">Brug link</button></div>
+      </div>
+      <div id="shareOn" hidden style="display:flex;flex-direction:column;gap:12px">
+        <p>Planen er delt. Åbn linket på en anden telefon eller computer, så er den med fra da af.</p>
+        <input class="txt" id="shareLink" readonly aria-label="Link til den delte plan" style="font-size:.85rem">
+        <div class="row"><button class="btn" id="shareCopy">Kopiér link</button><button class="btn quiet" id="shareLeave">Stop deling på denne enhed</button></div>
+        <p class="small muted">Alle med linket kan se og rette tallene, så del det kun med hinanden. Retter to på samme tid, gælder den seneste ændring.</p>
+      </div>
+      <p class="small muted" id="shareMsg"></p>
+    </div>
+    <div class="sheet" id="codeSheet">
+      <h2>Flyt jeres tal til en anden enhed</h2>
+      <p id="moveInfo">Tal og krydser gemmes på den enhed, I bruger. Vil I have dem med over på en anden telefon eller computer, så kopiér koden her og indsæt den på den anden enhed.</p>
+      <div class="row"><button class="btn" id="copyCode">Kopiér kode</button><span class="small muted" id="copyMsg"></span></div>
+      <textarea id="codeBox" style="min-height:80px;font-size:.8rem" placeholder="Indsæt en kode fra en anden enhed her"></textarea>
+      <div class="row"><button class="btn ghost" id="loadCode">Indlæs kode</button><button class="btn quiet" id="resetAll">Nulstil til eksempeltal</button><span class="small muted" id="loadMsg"></span></div>
+    </div>
+  </section>
 </div>
 
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-database-compat.js"></script>
 <script>
-    function calculate() {
-        const price = parseFloat(document.getElementById('price').value) || 0;
-        const type = document.getElementById('interestType').value;
+/* ===== Firebase: indsæt jeres web-app config her (Firebase-konsol > Projektindstillinger > Dine apps) =====
+   Kræver: Authentication > Anonym slået til, og Realtime Database med reglerne fra database.rules.json.
+   Er apiKey tom, kører siden uden deling og gemmer kun på enheden. */
+const FIREBASE_CONFIG = {
+  apiKey: "",
+  authDomain: "",
+  databaseURL: "",
+  projectId: "",
+  appId: ""
+};
 
-        const udbetaling = price * 0.05;
-        const banklaan = price * 0.15;
-        const realkredit = price * 0.80;
+/* ===== Dagens renter (opdateres ved at rette dette ene objekt) ===== */
+const RATES = {
+  date: "2. oktober 2026",
+  source: "Nordea Kredits refinansiering pr. 1. oktober 2026 (F1, F3, F5) og detkoster.dk (fast rente, F-kort). Renter er uden bidrag.",
+  fast:  {label:"Fast rente 30 år", rate:4.0, kurs:96.5, bidrag:0.70, fix:Infinity, when:"Aldrig"},
+  f5:    {label:"F5",     rate:3.2, kurs:100, bidrag:0.80, fix:60, when:"Efter 5 år"},
+  f3:    {label:"F3",     rate:3.0, kurs:100, bidrag:0.90, fix:36, when:"Efter 3 år"},
+  f1:    {label:"F1",     rate:3.1, kurs:100, bidrag:1.05, fix:12, when:"Efter 1 år"},
+  fkort: {label:"F-kort", rate:2.6, kurs:100, bidrag:0.85, fix:6,  when:"Efter et halvt år"}
+};
+const TYPES = ["fast","f5","f3","f1","fkort"];
 
-        document.getElementById('resUdbetaling').innerText = udbetaling.toLocaleString('da-DK') + ' kr.';
-        document.getElementById('resBanklaan').innerText = banklaan.toLocaleString('da-DK') + ' kr.';
-        document.getElementById('resRealkredit').innerText = realkredit.toLocaleString('da-DK') + ' kr.';
+const CHECK = [
+  ["Før I leder", [
+    ["budget","Lav et budget: hvad har I tilbage hver måned efter faste udgifter?"],
+    ["opsparing","Tjek opsparingen: 5 % i udbetaling plus købsomkostninger"],
+    ["bank","Hold møde med banken og få et lånebevis"],
+    ["flerebanker","Spørg mindst én anden bank om et tilbud"],
+    ["raadgiver","Vælg en køberrådgiver (advokat), før I skriver under på noget"]]],
+  ["Når I har fundet en lejlighed", [
+    ["salgsopst","Læs salgsopstillingen: pris, ejerudgifter og fællesudgifter"],
+    ["energi","Se energimærket og spørg til varmeforbruget"],
+    ["regnskab","Få ejerforeningens regnskab, budget og seneste referater"],
+    ["vedlplan","Få vedligeholdelsesplanen: er der store arbejder på vej?"],
+    ["husorden","Læs vedtægter og husorden: husdyr, barnevogn, altan, udlejning"],
+    ["besoeg","Se lejligheden to gange, gerne på forskellige tidspunkter"],
+    ["baby","Tjek det praktiske med Berta: elevator, støj, vuggestue og afstand til grønne områder"]]],
+  ["Selve købet", [
+    ["forbehold","Købsaftalen skal have advokatforbehold og bankforbehold"],
+    ["underskriv","Underskriv købsaftalen"],
+    ["fortryd","Husk fortrydelsesretten: 6 hverdage, og det koster 1 % af prisen at fortryde"],
+    ["udbetaling","Overfør udbetalingen (deponering) til den aftalte dato"],
+    ["vaelglaan","Vælg lånetype og aftal kurssikring med banken"],
+    ["indbo","Tegn indboforsikring fra overtagelsesdagen"],
+    ["liv","Tag stilling til livsforsikring og lønsikring"],
+    ["skoede","Underskriv skødet med MitID"]]],
+  ["Overtagelsen", [
+    ["gennemgang","Gennemgå lejligheden med sælger eller mægler, før I får nøglerne"],
+    ["maalere","Aflæs el, vand og varme, og tag billeder af målerne"],
+    ["noegler","Få alle nøgler, også til kælder, postkasse og vaskeri"],
+    ["adresse","Meld flytning på borger.dk"],
+    ["el","Bestil el og internet"],
+    ["forskud","Ret forskudsopgørelsen hos Skat med renter og boligskat"],
+    ["refusion","Tjek refusionsopgørelsen fra advokaten"],
+    ["ejerf","Meld jer til ejerforeningens administrator"]]]
+];
 
-        // Simpel estimering af månedlig ydelse efter skat
-        let monthly = 0;
-        if(type === 'fkort') {
-            monthly = (realkredit * 0.0035) + (banklaan * 0.006); // Ca. skøn
-        } else if(type === 'f5') {
-            monthly = (realkredit * 0.0042) + (banklaan * 0.006);
-        } else {
-            monthly = (realkredit * 0.0052) + (banklaan * 0.006);
-        }
-        
-        document.getElementById('resMaaned').innerText = Math.round(monthly).toLocaleString('da-DK') + ' kr./mdl.';
-    }
+/* ===== Tilstand ===== */
+function defaults(){
+  const mk = (t,name)=>({id:"s_"+t, type:t, name, rate:RATES[t].rate, bidrag:RATES[t].bidrag, kurs:RATES[t].kurs, years:30, io:false});
+  return { v:2, updatedAt:0, example:true,
+    price:1500000, income:750000, downPct:5, bankPct:15, bankRate:6.0, bankYears:20, tax:33,
+    one:{}, mon:{}, extraOne:[], extraMon:[],
+    scenarios:[mk("fast","Fast rente"), mk("f5","F5"), mk("fkort","F-kort")],
+    shift:1, kRest:1200000, kKurs:85, kCost:15000,
+    checks:{}, ownChecks:[], notes:"" };
+}
+let S = defaults();
+const LS = "boligkoeb.v1";
+function upgrade(st){ if((st.v||1)<2){ if(st.price===2500000) st.price=1500000; if(st.kRest===2000000) st.kRest=1200000; st.v=2; } return Object.assign(defaults(), st); }
+try{ const raw = localStorage.getItem(LS); if(raw) S = upgrade(JSON.parse(raw)); }catch(e){}
 
-    // Huskeliste gemme-logik via localStorage
-    function saveChecklist() {
-        for (let i = 1; i <= 6; i++) {
-            const cb = document.getElementById('check' + i);
-            const lbl = document.getElementById('label' + i);
-            localStorage.setItem('check' + i, cb.checked);
-            if (cb.checked) {
-                lbl.classList.add('done');
-            } else {
-                lbl.classList.remove('done');
-            }
-        }
-    }
+/* ===== Hjælpere ===== */
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"]/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const kr = n => Math.round(n).toLocaleString("da-DK");
+const krr = n => kr(n)+" kr.";
+const pc = (n,d=2) => Number(n).toLocaleString("da-DK",{minimumFractionDigits:0,maximumFractionDigits:d});
+const ceil100 = n => Math.ceil(n/100 - 1e-9)*100;
+function parseNum(str, kind){
+  let s = String(str).replace(/\s|kr\.?|%/g,"");
+  if(kind==="kr") s = s.replace(/\./g,"").replace(",",".");
+  else s = s.replace(",",".");
+  const n = parseFloat(s); return isFinite(n) ? n : 0;
+}
+const fmt = (n,kind) => kind==="kr" ? kr(n) : pc(n);
+function setVal(el, n, kind){ if(el && document.activeElement!==el) el.value = fmt(n,kind); }
 
-    function loadChecklist() {
-        for (let i = 1; i <= 6; i++) {
-            const saved = localStorage.getItem('check' + i) === 'true';
-            const cb = document.getElementById('check' + i);
-            const lbl = document.getElementById('label' + i);
-            cb.checked = saved;
-            if (saved) {
-                lbl.classList.add('done');
-            }
-        }
-    }
+/* ===== Beregning ===== */
+function split(){
+  const p = Math.max(0,S.price), down = p*S.downPct/100, bank = p*S.bankPct/100;
+  const rk = Math.max(0, p - down - bank);
+  return {p, down, bank, rk, rkPct: p ? rk/p*100 : 0};
+}
+function annuity(B, r, n){ if(n<=0) return B; const i=r/100/12; return i===0 ? B/n : B*i/(1-Math.pow(1+i,-n)); }
+/* Simulerer lånet måned for måned. shift = renteændring i procentpoint, der slår igennem efter rentebindingen. */
+function simulate(s, need, shift){
+  const kurs = Math.max(1, s.kurs||100), H = need/(kurs/100), n = Math.max(1,Math.round(s.years))*12, io = s.io ? 120 : 0;
+  const fix = RATES[s.type].fix;
+  let B = H, first=null, after=null, cost5=0, debt5=H;
+  for(let m=0;m<n;m++){
+    const r = Math.max(0, s.rate + (m>=fix ? shift : 0));
+    const rente = B*r/100/12, bidrag = B*s.bidrag/100/12;
+    const afdrag = m<io ? 0 : annuity(B, r, n-m) - rente;
+    const row = {rente, bidrag, afdrag, total: rente+bidrag+afdrag};
+    if(m===0) first=row;
+    if(after===null && m>=fix) after=row;
+    if(m<60) cost5 += rente+bidrag;
+    B -= afdrag;
+    if(m===59) debt5 = B;
+  }
+  return {H, first, after: after||first, cost5, debt5};
+}
+function bankLoan(){
+  const {bank} = split(); if(bank<=0) return {total:0,rente:0,afdrag:0};
+  const total = annuity(bank, S.bankRate, Math.max(1,S.bankYears)*12), rente = bank*S.bankRate/100/12;
+  return {total, rente, afdrag: total-rente};
+}
+function oneItems(){
+  const {p, bank, rk} = split();
+  const s0 = S.scenarios[0], H = s0 ? rk/(Math.max(1,s0.kurs)/100) : rk;
+  return [
+    {id:"skode", calc:true, name:"Tinglysning af skødet", help:"Afgift til staten for at registrere jer som ejere: 0,6 % af prisen plus 1.850 kr.", auto: p ? ceil100(p*0.006)+1850 : 0},
+    {id:"pantrk", calc:true, name:"Tinglysning af realkreditlånet", help:"Afgift til staten for at registrere lånet: 1,25 % af lånet plus 1.825 kr.", auto: H ? ceil100(H*0.0125)+1825 : 0},
+    {id:"pantbank", calc:true, name:"Tinglysning af bankens pant", help:"Banken vil typisk også have sikkerhed i lejligheden for banklånet. Samme sats.", auto: bank ? ceil100(bank*0.0125)+1825 : 0},
+    {id:"advokat", name:"Køberrådgiver (advokat)", help:"Læser købsaftalen og ejerforeningens papirer og laver skødet. Typisk 6.000 til 12.000 kr.", auto: 8000},
+    {id:"rkgebyr", calc:true, name:"Gebyrer til realkreditinstituttet", help:"Lånesagsgebyr, kurtage og kursskæring, når lånet udbetales.", auto: rk ? Math.round((4000+rk*0.0035)/100)*100 : 0},
+    {id:"bankgebyr", calc:true, name:"Oprettelse af banklån", help:"Stiftelsesgebyr, ofte 1 til 2 % af banklånet. Kan forhandles.", auto: Math.round(bank*0.02/100)*100},
+    {id:"ejerskifte", name:"Ejerskifteforsikring", help:"Sjældent relevant for lejligheder. Lad stå på 0, medmindre der er en tilstandsrapport.", auto: 0},
+    {id:"bygsag", name:"Byggesagkyndig gennemgang (valgfri)", help:"En fagperson ser lejligheden igennem før købet. Typisk 4.000 til 8.000 kr.", auto: 0},
+    {id:"flyt", name:"Flytning", help:"Flyttebil, kasser og eventuelt flyttefolk.", auto: 8000},
+    {id:"indret", name:"Maling, møbler og småting", help:"Der er altid noget, der skal købes eller ordnes.", auto: 25000}
+  ];
+}
+function monItems(){
+  const {p} = split();
+  return [
+    {id:"faelles", name:"Fællesudgifter til ejerforeningen", help:"Dækker trappevask, vicevært, bygningsforsikring og vedligeholdelse af det fælles.", auto: 2500},
+    {id:"evs", calc:true, name:"Ejendomsværdiskat", help:"0,51 % om året af 80 % af vurderingen. Her er prisen brugt som vurdering.", auto: Math.round(p*0.8*0.0051/12)},
+    {id:"grund", name:"Grundskyld", help:"Skat af jeres andel af grunden. Det rigtige tal står i salgsopstillingen.", auto: 450},
+    {id:"indbo", name:"Indboforsikring", help:"Dækker jeres ting. Den har I sikkert allerede.", auto: 250},
+    {id:"varme", name:"Varme", help:"", auto: 700},
+    {id:"el", name:"El", help:"", auto: 500},
+    {id:"vand", name:"Vand", help:"", auto: 300},
+    {id:"net", name:"Internet og tv", help:"", auto: 300},
+    {id:"vedl", name:"Opsparing til vedligeholdelse", help:"Nyt køkken, hvidevarer, gulve. Som lejer betaler udlejer. Nu er det jer.", auto: 800}
+  ];
+}
+const val = (map,it) => (map[it.id]===undefined || map[it.id]===null) ? it.auto : map[it.id];
+const sum = (items,map,extra) => items.reduce((a,it)=>a+val(map,it),0) + extra.reduce((a,e)=>a+(e.amount||0),0);
 
-    // Kør beregning og indlæs huskeliste ved opstart
-    window.onload = function() {
-        calculate();
-        loadChecklist();
-    };
+/* ===== Tegning af lister (kun når strukturen ændres) ===== */
+function drawCostList(kind){
+  const items = kind==="one" ? oneItems() : monItems(), map = S[kind], extra = kind==="one" ? S.extraOne : S.extraMon;
+  $(kind+"List").innerHTML = items.map(it=>`<div class="line">
+      <span class="nm">${esc(it.name)}${it.calc?` <span class="auto">Beregnes automatisk</span>`:""}</span>
+      <span class="inp"><input id="c-${kind}-${it.id}" data-cost="${kind}:${it.id}" data-kind="kr" inputmode="numeric" aria-label="${esc(it.name)}"><i>kr.</i></span>
+      <button class="btn quiet x" data-resetcost="${kind}:${it.id}" title="Tilbage til forslag" aria-label="Tilbage til forslag" ${map[it.id]===undefined?"hidden":""}>↺</button>
+      ${it.help?`<span class="hp">${esc(it.help)}</span>`:""}</div>`).join("") +
+    extra.map(e=>`<div class="line">
+      <input class="txt" id="xn-${e.id}" data-extra="${kind}:${e.id}:name" value="${esc(e.name)}" placeholder="Hvad er det?" aria-label="Navn på udgift">
+      <span class="inp"><input id="xa-${e.id}" data-extra="${kind}:${e.id}:amount" data-kind="kr" inputmode="numeric" value="${kr(e.amount||0)}" aria-label="Beløb"><i>kr.</i></span>
+      <button class="btn quiet x" data-delextra="${kind}:${e.id}" aria-label="Fjern">×</button></div>`).join("");
+}
+function drawScenarios(){
+  $("scen").innerHTML = S.scenarios.map(s=>`<div class="sc" id="sc-${s.id}">
+    <span class="badge" id="bd-${s.id}"></span>
+    <input class="txt" id="n-${s.id}" data-sc="${s.id}" data-f="name" value="${esc(s.name)}" aria-label="Navn på lånet" style="font-weight:700">
+    <div class="f2">
+      <label class="fld">Type<select id="t-${s.id}" data-sc="${s.id}" data-f="type">${TYPES.map(t=>`<option value="${t}" ${t===s.type?"selected":""}>${RATES[t].label}</option>`).join("")}</select></label>
+      <label class="fld">Løbetid<span class="inp"><input id="y-${s.id}" data-sc="${s.id}" data-f="years" data-kind="pct" inputmode="numeric" value="${pc(s.years)}"><i>år</i></span></label>
+      <label class="fld">Rente<span class="inp"><input id="r-${s.id}" data-sc="${s.id}" data-f="rate" data-kind="pct" inputmode="decimal" value="${pc(s.rate)}"><i>%</i></span></label>
+      <label class="fld">Bidrag<span class="inp"><input id="b-${s.id}" data-sc="${s.id}" data-f="bidrag" data-kind="pct" inputmode="decimal" value="${pc(s.bidrag)}"><i>%</i></span></label>
+      <label class="fld">Kurs<span class="inp"><input id="k-${s.id}" data-sc="${s.id}" data-f="kurs" data-kind="pct" inputmode="decimal" value="${pc(s.kurs)}"><i></i></span></label>
+      <label class="fld" style="justify-content:flex-end"><span class="row" style="gap:6px;flex-wrap:nowrap"><input type="checkbox" id="io-${s.id}" data-sc="${s.id}" data-f="io" ${s.io?"checked":""} style="width:18px;height:18px;accent-color:var(--accent)">10 år uden afdrag</span></label>
+    </div>
+    <div id="out-${s.id}"></div>
+    <div class="row"><button class="btn quiet" data-delsc="${s.id}">Slet lånet</button></div>
+  </div>`).join("") || `<p class="muted">Ingen lån endnu. Vælg en type ovenfor og tryk "Tilføj lån".</p>`;
+}
+function drawChecks(){
+  $("chkGroups").innerHTML = CHECK.map(([title,items])=>`<div class="sheet"><h3>${esc(title)}</h3><div class="chk">${
+    items.map(([id,txt])=>`<label><input type="checkbox" id="ck-${id}" data-chk="${id}" ${S.checks[id]?"checked":""}><span>${esc(txt)}</span></label>`).join("")}</div></div>`).join("");
+  $("chkOwn").innerHTML = S.ownChecks.map(c=>`<label><input type="checkbox" id="ck-${c.id}" data-chk="${c.id}" ${S.checks[c.id]?"checked":""}><span>${esc(c.text)}</span><button class="btn quiet" data-delchk="${c.id}" aria-label="Fjern punkt">×</button></label>`).join("")
+    || `<p class="muted small">Ingen egne punkter endnu.</p>`;
+}
+function drawRates(){
+  $("rateStamp").textContent = "Opdateret "+RATES.date+". Kilde: "+RATES.source;
+  $("rateRows").innerHTML = TYPES.map(t=>{const r=RATES[t];return `<tr><th>${r.label}</th><td class="n">${pc(r.rate)} %</td><td class="n">${pc(r.kurs)}</td><td class="n">${pc(r.bidrag)} %</td></tr>`}).join("");
+}
+
+/* ===== Genberegning (rører ikke felter, der skrives i) ===== */
+function recalc(){
+  const sp = split(), bk = bankLoan();
+  setVal($("price"),S.price,"kr"); setVal($("income"),S.income,"kr");
+  setVal($("downPct"),S.downPct,"pct"); setVal($("downKr"),sp.down,"kr");
+  setVal($("bankPct"),S.bankPct,"pct"); setVal($("bankKr"),sp.bank,"kr");
+  $("rkPct").value = pc(sp.rkPct); $("rkKr").value = kr(sp.rk);
+  setVal($("bankRate"),S.bankRate,"pct"); setVal($("bankYears"),S.bankYears,"pct"); setVal($("tax"),S.tax,"pct");
+  setVal($("kRest"),S.kRest,"kr"); setVal($("kKurs"),S.kKurs,"pct"); setVal($("kCost"),S.kCost,"kr");
+  $("b-own").style.width = S.downPct+"%"; $("b-bank").style.width = S.bankPct+"%"; $("b-rk").style.width = sp.rkPct+"%";
+
+  const notes=[];
+  if(S.downPct<5) notes.push("Udbetalingen er under 5 %. Loven kræver mindst 5 % af prisen.");
+  if(sp.rkPct>80.001) notes.push("Realkreditlånet er over 80 % af prisen. Sæt banklånet eller udbetalingen op, så det højst er 80 %.");
+  if(S.downPct+S.bankPct>100) notes.push("Udbetaling og banklån er tilsammen mere end prisen.");
+  $("splitNote").innerHTML = notes.map(n=>`<p class="note warn">${n}</p>`).join("");
+
+  // omkostninger
+  const one = oneItems(), mon = monItems();
+  one.forEach(it=>setVal($("c-one-"+it.id), val(S.one,it), "kr"));
+  mon.forEach(it=>setVal($("c-mon-"+it.id), val(S.mon,it), "kr"));
+  const oneT = sum(one,S.one,S.extraOne), monT = sum(mon,S.mon,S.extraMon);
+  $("oneTotal").textContent = krr(oneT); $("oneDown").textContent = krr(sp.down); $("oneAll").textContent = krr(oneT+sp.down);
+  $("monTotal").textContent = krr(monT);
+
+  // scenarier
+  const res = S.scenarios.map(s=>({s, r:simulate(s, sp.rk, 0), a:simulate(s, sp.rk, S.shift)}));
+  const min = res.length ? Math.min(...res.map(x=>x.r.first.total)) : 0;
+  res.forEach(({s,r})=>{
+    const f=r.first, diff=f.total-min, card=$("sc-"+s.id), bd=$("bd-"+s.id); if(!card) return;
+    const best = res.length>1 && diff<0.5;
+    card.classList.toggle("best",best); bd.classList.toggle("best",best);
+    bd.textContent = res.length<2 ? RATES[s.type].label : best ? "Billigst pr. måned" : "+"+kr(diff)+" kr. dyrere pr. måned";
+    const net = f.total - (f.rente+f.bidrag)*S.tax/100;
+    $("out-"+s.id).innerHTML =
+      `<div class="kv main"><span>Betaling pr. måned</span><b>${krr(f.total)}</b></div>
+       <div class="kv"><span>Rente</span><b>${krr(f.rente)}</b></div>
+       <div class="kv"><span>Bidrag</span><b>${krr(f.bidrag)}</b></div>
+       <div class="kv"><span>Afdrag (jeres opsparing)</span><b>${krr(f.afdrag)}</b></div>
+       <div class="kv"><span>Efter skat ca.</span><b>${krr(net)}</b></div>
+       <div class="kv"><span>I kommer til at skylde</span><b>${krr(r.H)}</b></div>
+       <div class="kv"><span>Rente og bidrag på 5 år</span><b>${krr(r.cost5)}</b></div>
+       <div class="kv"><span>Gæld efter 5 år</span><b>${krr(r.debt5)}</b></div>`;
+  });
+  $("scIntro").textContent = "Lånene er regnet på et realkreditlån, der giver "+krr(sp.rk)+" udbetalt. Billigste betaling pr. måned får grøn kant. Sammenlign også gælden efter 5 år: et lån kan være billigt, fordi der afdrages mindre.";
+  const sh = S.shift; $("shift").value = sh;
+  $("shiftLbl").textContent = sh===0 ? "Renten er uændret" : "Renten "+(sh>0?"stiger":"falder")+" "+pc(Math.abs(sh))+" procentpoint";
+  $("shiftRows").innerHTML = res.map(({s,r,a})=>{const d=a.after.total-r.first.total, fx=RATES[s.type].fix===Infinity;
+    return `<tr><th>${esc(s.name)}</th><td class="n">${kr(r.first.total)}</td><td class="n">${kr(fx?r.first.total:a.after.total)}</td><td class="n" style="color:var(${fx||Math.abs(d)<1?"--muted":d>0?"--warn":"--good"})">${fx?"0":(d>0?"+":"")+kr(d)} kr.</td><td>${RATES[s.type].when}</td></tr>`}).join("")
+    || `<tr><td colspan="5" class="muted">Tilføj et lån for at se effekten.</td></tr>`;
+
+  // overblik
+  const firstSc = res[0];
+  $("o-cash").textContent = krr(sp.down+oneT);
+  $("o-cash2").textContent = "Udbetaling "+kr(sp.down)+" + omkostninger "+kr(oneT);
+  if(firstSc){
+    const f=firstSc.r.first, tot=f.total+bk.total+monT, net=tot-(f.rente+f.bidrag+bk.rente)*S.tax/100;
+    $("o-month").textContent = krr(tot);
+    $("o-month2").textContent = esc(firstSc.s.name)+" "+kr(f.total)+" + banklån "+kr(bk.total)+" + faste udgifter "+kr(monT)+". Efter skat ca. "+kr(net)+".";
+  } else { $("o-month").textContent = krr(bk.total+monT); $("o-month2").textContent = "Banklån og faste udgifter. Tilføj et lån under Sammenlign lån."; }
+  const debt = sp.rk+sp.bank, gf = S.income>0 ? debt/S.income : 0, ltv = 100-S.downPct;
+  $("o-gf").textContent = S.income>0 ? pc(gf,1)+" gange" : "–";
+  const limited = gf>4 && ltv>60;
+  const gtxt = S.income<=0 ? "Skriv jeres indkomst for at se tallet." : limited
+    ? "Over 4 gange: I skal vælge F5 eller fast rente."
+    : "Under 4 gange: I kan frit vælge lånetype.";
+  $("o-gf2").textContent = gtxt;
+  $("gfNote").textContent = S.income<=0 ? "Skriv jeres årsindkomst på Overblik for at se, om reglen gælder jer."
+    : "Med tallene fra Overblik er jeres gæld "+pc(gf,1)+" gange indkomsten. "+(limited?"Reglen gælder jer: vælg F5 eller fast rente.":"Reglen begrænser jer ikke.");
+
+  // kurs
+  const fr = S.scenarios.find(s=>s.type==="fast") || {kurs:RATES.fast.kurs};
+  $("kursEx").textContent = "Eksempel med kurs "+pc(fr.kurs)+": For hver 100 kr. I skylder, får I "+pc(fr.kurs)+" kr. udbetalt. Skal I bruge "+krr(sp.rk)+", kommer I derfor til at skylde "+krr(sp.rk/(Math.max(1,fr.kurs)/100))+". Forskellen hedder kurstab.";
+  const pay = S.kRest*Math.min(S.kKurs,100)/100, gain = S.kRest-pay-S.kCost;
+  $("kOut").textContent = S.kKurs>=100
+    ? "Kursen er 100 eller højere. I kan altid indfri til kurs 100, så det koster "+krr(S.kRest)+" plus "+krr(S.kCost)+" i omkostninger. Det er her, nedkonvertering til en lavere rente bliver interessant."
+    : "Ved kurs "+pc(S.kKurs)+" koster det "+krr(pay)+" at købe lånet tilbage. Efter omkostninger bliver gælden ca. "+krr(Math.abs(gain))+(gain>=0?" mindre":" større")+". Til gengæld får det nye lån en højere rente.";
+
+  // huskeliste
+  const all = CHECK.flatMap(g=>g[1].map(i=>i[0])).concat(S.ownChecks.map(c=>c.id));
+  const done = all.filter(id=>S.checks[id]).length;
+  $("chkCount").textContent = done+" af "+all.length; $("chkBar").style.width = (all.length?done/all.length*100:0)+"%";
+  if(document.activeElement!==$("notes")) $("notes").value = S.notes;
+}
+function drawAll(){ drawCostList("one"); drawCostList("mon"); drawScenarios(); drawChecks(); drawRates(); recalc(); }
+
+/* ===== Gem: altid på denne enhed, og i den delte plan (Firebase) når den er slået til ===== */
+let fb=null, planId=null, planRef=null, saveT=null, writing=false, dirty=false, pendingRemote=null, joining=false;
+function setSync(t){ $("sync").textContent=t; }
+function saveLocal(){ try{ localStorage.setItem(LS, JSON.stringify(S)); }catch(e){} }
+function typing(){ const a=document.activeElement; return !!a && /INPUT|TEXTAREA|SELECT/.test(a.tagName) && a.type!=="range" && a.type!=="checkbox" && !a.readOnly; }
+function changed(){
+  S.updatedAt = Date.now(); S.example=false; saveLocal();
+  if(planRef){ dirty=true; clearTimeout(saveT); saveT=setTimeout(push, 800); setSync("Gemmer …"); }
+}
+async function push(){
+  if(writing||!dirty||!planRef) return; writing=true; dirty=false;
+  try{ await planRef.set({json:JSON.stringify(S), updatedAt:S.updatedAt}); setSync("Delt plan: gemt"); }
+  catch(e){ dirty=true; setSync("Kunne ikke gemme i den delte plan"); writing=false; return; }
+  writing=false; if(dirty){ clearTimeout(saveT); saveT=setTimeout(push, 800); }
+}
+function adopt(st){ S = upgrade(st); saveLocal(); drawAll(); }
+function onRemote(snap){
+  const d = snap.val(), wasJoining = joining; joining=false;
+  if(d && typeof d.json==="string" && (d.updatedAt||0) > (S.updatedAt||0)){
+    let st; try{ st=JSON.parse(d.json); }catch(e){ return; }
+    if(typing()){ pendingRemote=st; return; }
+    adopt(st); setSync("Delt plan: opdateret");
+  } else if(!d && wasJoining){
+    leavePlan(); $("shareMsg").textContent="Planen blev ikke fundet. Tjek at hele linket er kopieret.";
+  } else if(S.updatedAt>0 && (!d || (d.updatedAt||0) < S.updatedAt)){ dirty=true; push(); }
+  else setSync("Delt plan: gemt");
+}
+function planLink(){ return location.origin+location.pathname+"?plan="+planId; }
+function drawShare(){
+  const on=!!planId; $("shareOff").hidden=on; $("shareOn").hidden=!on;
+  if(on) $("shareLink").value=planLink();
+}
+function connect(id, join){
+  if(planRef) planRef.off();
+  planId=id; try{ localStorage.setItem(LS+".plan", id); }catch(e){}
+  joining=!!join; if(join) S.updatedAt=0;
+  planRef = fb.database().ref("plans/"+id);
+  setSync("Henter delt plan …");
+  planRef.on("value", onRemote, ()=>{ setSync("Ingen adgang til den delte plan"); });
+  drawShare();
+}
+function leavePlan(){
+  if(planRef) planRef.off(); planRef=null; planId=null;
+  try{ localStorage.removeItem(LS+".plan"); }catch(e){}
+  setSync("Gemmer på denne enhed"); drawShare();
+}
+function newId(){ const abc="abcdefghijkmnpqrstuvwxyz23456789", a=new Uint8Array(24); crypto.getRandomValues(a); return [...a].map(x=>abc[x%abc.length]).join(""); }
+function shareClick(t){
+  if(t.id==="shareCreate"){ if(!S.updatedAt) S.updatedAt=Date.now(); connect(newId(), false); dirty=true; push(); $("shareMsg").textContent=""; return true; }
+  if(t.id==="shareJoin"){
+    const v=$("joinBox").value.trim(), m=v.match(/plan=([a-z0-9]{20,})/i) || v.match(/^([a-z0-9]{20,})$/i);
+    if(!m){ $("shareMsg").textContent="Det ligner ikke et link til en delt plan."; return true; }
+    $("shareMsg").textContent=""; connect(m[1], true); return true;
+  }
+  if(t.id==="shareCopy"){
+    const ok=()=>$("shareMsg").textContent="Linket er kopieret.", fail=()=>{ $("shareLink").select(); $("shareMsg").textContent="Markér og kopiér linket i feltet."; };
+    try{ navigator.clipboard.writeText(planLink()).then(ok, fail); }catch(_){ fail(); } return true;
+  }
+  if(t.id==="shareLeave"){
+    if(t.dataset.sure!=="1"){ t.dataset.sure="1"; t.textContent="Tryk igen for at stoppe"; setTimeout(()=>{ t.dataset.sure=""; t.textContent="Stop deling på denne enhed"; }, 3000); return true; }
+    t.dataset.sure=""; t.textContent="Stop deling på denne enhed"; leavePlan(); $("shareMsg").textContent="Denne enhed er ikke længere med i den delte plan. Tallene ligger stadig her."; return true;
+  }
+  return false;
+}
+(async function initShare(){
+  if(!FIREBASE_CONFIG.apiKey || !window.firebase) return;
+  try{ firebase.initializeApp(FIREBASE_CONFIG); await firebase.auth().signInAnonymously(); fb=firebase; }
+  catch(e){ setSync("Deling er ikke tilgængelig lige nu"); return; }
+  $("shareSheet").hidden=false; $("codeSheet").hidden=true;
+  let stored=null; try{ stored=localStorage.getItem(LS+".plan"); }catch(e){}
+  const m = location.search.match(/[?&]plan=([a-z0-9]{20,})/i);
+  if(m) connect(m[1], m[1]!==stored); else if(stored) connect(stored, false); else drawShare();
+})();
+
+/* ===== Hændelser ===== */
+document.addEventListener("input", e=>{
+  const t=e.target, kind=t.dataset.kind;
+  if(t.dataset.bind){
+    const k=t.dataset.bind, sp=split();
+    if(k==="notes") S.notes=t.value;
+    else if(k==="downKr") S.downPct = sp.p ? parseNum(t.value,"kr")/sp.p*100 : 0;
+    else if(k==="bankKr") S.bankPct = sp.p ? parseNum(t.value,"kr")/sp.p*100 : 0;
+    else S[k]=parseNum(t.value,kind);
+  } else if(t.dataset.cost){
+    const [k,id]=t.dataset.cost.split(":"); S[k][id]=parseNum(t.value,"kr");
+    const rb=document.querySelector(`[data-resetcost="${k}:${id}"]`); if(rb) rb.hidden=false;
+  } else if(t.dataset.extra){
+    const [k,id,f]=t.dataset.extra.split(":"), arr=k==="one"?S.extraOne:S.extraMon, it=arr.find(x=>x.id===id);
+    if(it) it[f] = f==="amount" ? parseNum(t.value,"kr") : t.value;
+  } else if(t.dataset.sc){
+    const s=S.scenarios.find(x=>x.id===t.dataset.sc), f=t.dataset.f; if(!s) return;
+    if(f==="name") s.name=t.value; else if(f==="io") s.io=t.checked;
+    else if(f==="type"){ s.type=t.value; const r=RATES[s.type]; s.rate=r.rate; s.bidrag=r.bidrag; s.kurs=r.kurs; s.name=r.label; changed(); drawScenarios(); recalc(); return; }
+    else s[f]=parseNum(t.value,"pct");
+  } else if(t.id==="shift"){ S.shift=parseFloat(t.value); }
+  else if(t.dataset.chk){ S.checks[t.dataset.chk]=t.checked; }
+  else return;
+  changed(); recalc();
+});
+document.addEventListener("focusout", e=>{ const t=e.target; if(t.dataset && t.dataset.kind && t.value!=="") t.value = fmt(parseNum(t.value,t.dataset.kind), t.dataset.kind); recalc();
+  setTimeout(()=>{ if(pendingRemote && !typing()){ const st=pendingRemote; pendingRemote=null; if((st.updatedAt||0)>(S.updatedAt||0)) adopt(st); } }, 0); });
+document.addEventListener("click", e=>{
+  const t=e.target.closest("button"); if(!t) return; const d=t.dataset;
+  if(d.tab){ show(d.tab); return; }
+  if(shareClick(t)) return;
+  if(d.add){ (d.add==="one"?S.extraOne:S.extraMon).push({id:"x"+Date.now().toString(36), name:"", amount:0}); drawCostList(d.add); }
+  else if(d.delextra){ const [k,id]=d.delextra.split(":"); if(k==="one") S.extraOne=S.extraOne.filter(x=>x.id!==id); else S.extraMon=S.extraMon.filter(x=>x.id!==id); drawCostList(k); }
+  else if(d.resetcost){ const [k,id]=d.resetcost.split(":"); delete S[k][id]; t.hidden=true; }
+  else if(d.delsc){
+    if(t.dataset.sure!=="1"){ t.dataset.sure="1"; t.textContent="Tryk igen for at slette"; setTimeout(()=>{ if(t.isConnected){ t.dataset.sure=""; t.textContent="Slet lånet"; } }, 3000); return; }
+    S.scenarios=S.scenarios.filter(x=>x.id!==d.delsc); drawScenarios();
+  }
+  else if(t.id==="addSc"){ const ty=$("addType").value, r=RATES[ty]; S.scenarios.push({id:"s"+Date.now().toString(36), type:ty, name:r.label, rate:r.rate, bidrag:r.bidrag, kurs:r.kurs, years:30, io:false}); drawScenarios(); }
+  else if(t.id==="addChk"){ const v=$("newChk").value.trim(); if(!v) return; S.ownChecks.push({id:"o"+Date.now().toString(36), text:v}); $("newChk").value=""; drawChecks(); }
+  else if(d.delchk){ e.preventDefault(); S.ownChecks=S.ownChecks.filter(c=>c.id!==d.delchk); delete S.checks[d.delchk]; drawChecks(); }
+  else if(t.id==="copyCode"){
+    const code = btoa(unescape(encodeURIComponent(JSON.stringify(S)))); $("codeBox").value=code;
+    const ok=()=>$("copyMsg").textContent="Koden er kopieret.", fail=()=>{ $("codeBox").select(); $("copyMsg").textContent="Markér og kopiér koden i feltet."; };
+    try{ navigator.clipboard.writeText(code).then(ok, fail); }catch(_){ fail(); } return;
+  }
+  else if(t.id==="loadCode"){
+    try{ const st=JSON.parse(decodeURIComponent(escape(atob($("codeBox").value.trim())))); if(!st || typeof st.price!=="number") throw 0; S=upgrade(st); $("loadMsg").textContent="Tallene er indlæst."; drawAll(); }
+    catch(_){ $("loadMsg").textContent="Koden kunne ikke læses. Kopiér hele koden og prøv igen."; return; }
+  }
+  else if(t.id==="resetAll"){
+    if(t.dataset.sure!=="1"){ t.dataset.sure="1"; t.textContent="Tryk igen for at nulstille alt"; setTimeout(()=>{ t.dataset.sure=""; t.textContent="Nulstil til eksempeltal"; }, 3000); return; }
+    t.dataset.sure=""; t.textContent="Nulstil til eksempeltal"; S=defaults(); drawAll();
+  }
+  else return;
+  changed(); recalc();
+});
+$("newChk").addEventListener("keydown", e=>{ if(e.key==="Enter") $("addChk").click(); });
+
+/* ===== Faner ===== */
+const TABS = [...document.querySelectorAll("#tabs button")].map(b=>b.dataset.tab);
+function show(name){
+  if(!TABS.includes(name)) name="overblik";
+  TABS.forEach(t=>{ $("t-"+t).hidden = t!==name; });
+  document.querySelectorAll("#tabs button").forEach(b=>{ const on=b.dataset.tab===name; b.setAttribute("aria-selected",on); b.setAttribute("role","tab"); if(on) b.scrollIntoView({block:"nearest",inline:"center"}); });
+  try{ history.replaceState(null,"","#"+name); }catch(e){}
+  try{ localStorage.setItem(LS+".tab", name); }catch(e){}
+}
+let startTab = location.hash.slice(1); if(!startTab){ try{ startTab = localStorage.getItem(LS+".tab")||""; }catch(e){} }
+drawAll(); show(startTab||"overblik");
 </script>
-
 </body>
 </html>
