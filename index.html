@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Boligkøbs-Beregnings & Huskeliste for Tania, André & Berta</title>
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --secondary: #3498db;
+            --accent: #e74c3c;
+            --bg: #f8f9fa;
+            --card-bg: #ffffff;
+            --text: #333333;
+            --border: #ddd;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        header {
+            text-align: center;
+            background: var(--primary);
+            color: white;
+            padding: 30px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+        }
+        header h1 {
+            margin: 0 0 10px 0;
+            font-size: 1.8rem;
+        }
+        header p {
+            margin: 0;
+            opacity: 0.9;
+        }
+        .card {
+            background: var(--card-bg);
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            margin-bottom: 25px;
+        }
+        h2 {
+            color: var(--primary);
+            border-bottom: 2px solid var(--secondary);
+            padding-bottom: 8px;
+            margin-top: 0;
+            font-size: 1.3rem;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        input, select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 1rem;
+            box-sizing: border-box;
+        }
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        @media (max-width: 600px) {
+            .grid-2 { grid-template-columns: 1fr; }
+        }
+        .result-box {
+            background: #eef2f7;
+            padding: 15px;
+            border-radius: 6px;
+            margin-top: 15px;
+        }
+        .result-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+        .result-row.total {
+            font-weight: bold;
+            border-top: 1px solid var(--border);
+            padding-top: 8px;
+            font-size: 1.1rem;
+            color: var(--primary);
+        }
+        ul.checklist {
+            list-style: none;
+            padding: 0;
+        }
+        ul.checklist li {
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            align-items: center;
+        }
+        ul.checklist input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            margin-right: 15px;
+            cursor: pointer;
+        }
+        ul.checklist label {
+            cursor: pointer;
+            font-weight: normal;
+            margin-bottom: 0;
+        }
+        ul.checklist label.done {
+            text-decoration: line-through;
+            color: #888;
+        }
+        .info-box {
+            background: #fff8e1;
+            border-left: 4px solid #ffc107;
+            padding: 12px;
+            border-radius: 4px;
+            font-size: 0.95rem;
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>Lejlighedskøb: Guide, Låneberegner & Huskeliste</h1>
+        <p>Lavet til Tania, André & lille Berta 🏡</p>
+    </header>
+
+    <!-- 1. BOLIGKØB & LÅNEBEREGNER -->
+    <div class="card">
+        <h2>1. Bolig- og Låneberegner</h2>
+        <div class="info-box">
+            Indtast boligens pris for at se fordelingen mellem egen udbetaling (5%), banklån (15%), realkreditlån (80%) samt månedlige udgifter for forskellige lånetyper.
+        </div>
+        
+        <div class="grid-2">
+            <div class="form-group">
+                <label for="price">Købesum (kr.):</label>
+                <input type="number" id="price" value="2500000" step="50000" oninput="calculate()">
+            </div>
+            <div class="form-group">
+                <label for="interestType">Vælg låntype til sammenligning:</label>
+                <select id="interestType" onchange="calculate()">
+                    <option value="fkort">F-kort / F1 (Lav rente, variabel ~2.4%)</option>
+                    <option value="f5">F5-lån (Fast i 5 år ~3.0%)</option>
+                    <option value="fast">Fastforrentet (30 år, 4.0%)</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="result-box">
+            <h3>Finansieringsstruktur:</h3>
+            <div class="result-row">
+                <span>Egen udbetaling (5%):</span>
+                <span id="resUdbetaling">125.000 kr.</span>
+            </div>
+            <div class="result-row">
+                <span>Banklån (15%):</span>
+                <span id="resBanklaan">375.000 kr.</span>
+            </div>
+            <div class="result-row">
+                <span>Realkreditlån (80%):</span>
+                <span id="resRealkredit">2.000.000 kr.</span>
+            </div>
+            <div class="result-row total">
+                <span>Estimeret månedlig ydelse (efter skat):</span>
+                <span id="resMaaned">0 kr.</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. HUSKELISTE MED GEMMEFUNKTION -->
+    <div class="card">
+        <h2>2. Fælles Huskeliste (Gemmer automatisk på enheden)</h2>
+        <p style="font-size: 0.9rem; color: #666;">Afkryds emnerne efterhånden som I kommer igennem processen. Det huskes automatisk, selv hvis I lukker siden.</p>
+        
+        <ul class="checklist" id="checklist">
+            <li>
+                <input type="checkbox" id="check1" onchange="saveChecklist()">
+                <label for="check1" id="label1">Få et godkendt lånebevis fra banken</label>
+            </li>
+            <li>
+                <input type="checkbox" id="check2" onchange="saveChecklist()">
+                <label for="check2" id="label2">Gennemse salgsopstilling og energimærke</label>
+            </li>
+            <li>
+                <input type="checkbox" id="check3" onchange="saveChecklist()">
+                <label for="check3" id="label3">Tjek ejerforeningens vedtægter og seneste regnskab</label>
+            </li>
+            <li>
+                <input type="checkbox" id="check4" onchange="saveChecklist()">
+                <label for="check4" id="label4">Få en køberrådgiver / advokat til at godkende købsaftalen</label>
+            </li>
+            <li>
+                <input type="checkbox" id="check5" onchange="saveChecklist()">
+                <label for="check5" id="label5">Opret/opdater indboforsikring og tjek ejerforeningens bygningsforsikring</label>
+            </li>
+            <li>
+                <input type="checkbox" id="check6" onchange="saveChecklist()">
+                <label for="check6" id="label6">Tinglysning af skøde og pantebreve</label>
+            </li>
+        </ul>
+    </div>
+
+    <!-- 3. FORKLARINGER -->
+    <div class="card">
+        <h2>3. Hurtig guide til lån og udgifter</h2>
+        <p><strong>Hvordan hænger lånene sammen?</strong></p>
+        <ul>
+            <li><strong>Udbetaling (5%):</strong> Skal betales kontant af egen lomme.</li>
+            <li><strong>Realkreditlån (80%):</strong> Danmarks billigste lån, der optages gennem et realkreditinstitut mod pant i lejligheden.</li>
+            <li><strong>Banklån (15%):</strong> Dækker det resterende beløb mellem udbetaling og realkreditlån. Har en kortere afdragstid og en højere rente.</li>
+        </ul>
+        <p><strong>Forskellen på at bo til leje vs. eje:</strong></p>
+        <ul>
+            <li><strong>Fællesudgifter:</strong> Som ejer betaler man hver måned til en ejerforening, som dækker udvendig vedligehold og bygningsforsikring.</li>
+            <li><strong>Vedligeholdelse:</strong> Går vandhanen i stykker, betaler man selv regningen (modsat lejebolig, hvor udlejer ordner det). Til gengæld går afdragene på lånet til jeres egen opsparing!</li>
+        </ul>
+    </div>
+</div>
+
+<script>
+    function calculate() {
+        const price = parseFloat(document.getElementById('price').value) || 0;
+        const type = document.getElementById('interestType').value;
+
+        const udbetaling = price * 0.05;
+        const banklaan = price * 0.15;
+        const realkredit = price * 0.80;
+
+        document.getElementById('resUdbetaling').innerText = udbetaling.toLocaleString('da-DK') + ' kr.';
+        document.getElementById('resBanklaan').innerText = banklaan.toLocaleString('da-DK') + ' kr.';
+        document.getElementById('resRealkredit').innerText = realkredit.toLocaleString('da-DK') + ' kr.';
+
+        // Simpel estimering af månedlig ydelse efter skat
+        let monthly = 0;
+        if(type === 'fkort') {
+            monthly = (realkredit * 0.0035) + (banklaan * 0.006); // Ca. skøn
+        } else if(type === 'f5') {
+            monthly = (realkredit * 0.0042) + (banklaan * 0.006);
+        } else {
+            monthly = (realkredit * 0.0052) + (banklaan * 0.006);
+        }
+        
+        document.getElementById('resMaaned').innerText = Math.round(monthly).toLocaleString('da-DK') + ' kr./mdl.';
+    }
+
+    // Huskeliste gemme-logik via localStorage
+    function saveChecklist() {
+        for (let i = 1; i <= 6; i++) {
+            const cb = document.getElementById('check' + i);
+            const lbl = document.getElementById('label' + i);
+            localStorage.setItem('check' + i, cb.checked);
+            if (cb.checked) {
+                lbl.classList.add('done');
+            } else {
+                lbl.classList.remove('done');
+            }
+        }
+    }
+
+    function loadChecklist() {
+        for (let i = 1; i <= 6; i++) {
+            const saved = localStorage.getItem('check' + i) === 'true';
+            const cb = document.getElementById('check' + i);
+            const lbl = document.getElementById('label' + i);
+            cb.checked = saved;
+            if (saved) {
+                lbl.classList.add('done');
+            }
+        }
+    }
+
+    // Kør beregning og indlæs huskeliste ved opstart
+    window.onload = function() {
+        calculate();
+        loadChecklist();
+    };
+</script>
+
+</body>
+</html>
