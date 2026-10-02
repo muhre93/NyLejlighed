@@ -33,13 +33,13 @@ p{margin:0;max-width:65ch}
 .muted{color:var(--muted)}
 .small{font-size:.875rem}
 .top{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:baseline;justify-content:space-between;margin-bottom:12px}
+.sync.tap{cursor:pointer;color:var(--accent);border-color:var(--accent);font-weight:600}
 .sync{font-size:.8rem;color:var(--muted);border:1px solid var(--line);border-radius:99px;padding:2px 10px;background:var(--surface)}
 nav{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);margin-inline:-16px;padding:8px 16px;border-bottom:1px solid var(--line)}
-.tabs{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none}
-.tabs::-webkit-scrollbar{display:none}
-.tabs button{flex:none;font:inherit;font-size:.92rem;font-weight:600;color:var(--muted);background:transparent;border:1px solid transparent;border-radius:99px;padding:6px 13px;cursor:pointer}
-.tabs button[aria-selected="true"]{background:var(--accent);color:var(--accent-ink)}
-.tabs button:hover:not([aria-selected="true"]){border-color:var(--line);color:var(--ink)}
+.tabs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
+.tabs button{font:inherit;font-size:.92rem;font-weight:600;line-height:1.2;color:var(--muted);background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:8px 6px;cursor:pointer;min-width:0;overflow-wrap:anywhere;text-wrap:balance}
+.tabs button[aria-selected="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.tabs button:hover:not([aria-selected="true"]){color:var(--ink)}
 button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible,summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 section.tab{display:flex;flex-direction:column;gap:20px;padding-top:24px}
 .lead{font-size:1.05rem;color:var(--muted)}
@@ -109,7 +109,7 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 dl{margin:0;display:grid;grid-template-columns:minmax(90px,150px) minmax(0,1fr);gap:8px 14px;font-size:.93rem}
 dt{font-weight:700} dd{margin:0;color:var(--muted)}
 .two{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(250px,1fr))}
-@media (max-width:480px){ .line{grid-template-columns:minmax(0,1fr) 122px auto} dl{grid-template-columns:1fr} dd{margin-bottom:6px} }
+@media (max-width:480px){ .tabs{gap:4px} .tabs button{font-size:.7rem;padding:7px 2px;overflow-wrap:normal} .line{grid-template-columns:minmax(0,1fr) 122px auto} dl{grid-template-columns:1fr} dd{margin-bottom:6px} }
 @media (prefers-reduced-motion:no-preference){ .prog i,.bar span{transition:width .25s} }
 </style>
 <style>
@@ -415,11 +415,13 @@ img{max-width:100%}
    Kræver: Authentication > Anonym slået til, og Realtime Database med reglerne fra database.rules.json.
    Er apiKey tom, kører siden uden deling og gemmer kun på enheden. */
 const FIREBASE_CONFIG = {
-  apiKey: "",
-  authDomain: "",
-  databaseURL: "",
-  projectId: "",
-  appId: ""
+  apiKey: "AIzaSyBLNfQkzEOsN1hbeLZqLFkl_K6tqK-0R7Q",
+  authDomain: "nylejlighed.firebaseapp.com",
+  databaseURL: "https://nylejlighed-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "nylejlighed",
+  storageBucket: "nylejlighed.firebasestorage.app",
+  messagingSenderId: "668459792560",
+  appId: "1:668459792560:web:df54528776f2bb8e726375"
 };
 
 /* ===== Dagens renter (opdateres ved at rette dette ene objekt) ===== */
@@ -691,7 +693,9 @@ function drawAll(){ drawCostList("one"); drawCostList("mon"); drawScenarios(); d
 
 /* ===== Gem: altid på denne enhed, og i den delte plan (Firebase) når den er slået til ===== */
 let fb=null, planId=null, planRef=null, saveT=null, writing=false, dirty=false, pendingRemote=null, joining=false;
-function setSync(t){ $("sync").textContent=t; }
+function setSync(t){ $("sync").textContent=t; $("sync").classList.toggle("tap", !!fb && !planId); }
+function idle(){ setSync(fb ? "Kun på denne enhed · tryk for at dele" : "Gemmer på denne enhed"); }
+$("sync").addEventListener("click", ()=>{ if(fb && !planId){ show("noter"); $("shareSheet").scrollIntoView({block:"center"}); } });
 function saveLocal(){ try{ localStorage.setItem(LS, JSON.stringify(S)); }catch(e){} }
 function typing(){ const a=document.activeElement; return !!a && /INPUT|TEXTAREA|SELECT/.test(a.tagName) && a.type!=="range" && a.type!=="checkbox" && !a.readOnly; }
 function changed(){
@@ -733,7 +737,7 @@ function connect(id, join){
 function leavePlan(){
   if(planRef) planRef.off(); planRef=null; planId=null;
   try{ localStorage.removeItem(LS+".plan"); }catch(e){}
-  setSync("Gemmer på denne enhed"); drawShare();
+  idle(); drawShare();
 }
 function newId(){ const abc="abcdefghijkmnpqrstuvwxyz23456789", a=new Uint8Array(24); crypto.getRandomValues(a); return [...a].map(x=>abc[x%abc.length]).join(""); }
 function shareClick(t){
@@ -760,7 +764,7 @@ function shareClick(t){
   $("shareSheet").hidden=false; $("codeSheet").hidden=true;
   let stored=null; try{ stored=localStorage.getItem(LS+".plan"); }catch(e){}
   const m = location.search.match(/[?&]plan=([a-z0-9]{20,})/i);
-  if(m) connect(m[1], m[1]!==stored); else if(stored) connect(stored, false); else drawShare();
+  if(m) connect(m[1], m[1]!==stored); else if(stored) connect(stored, false); else { idle(); drawShare(); }
 })();
 
 /* ===== Hændelser ===== */
@@ -827,7 +831,7 @@ const TABS = [...document.querySelectorAll("#tabs button")].map(b=>b.dataset.tab
 function show(name){
   if(!TABS.includes(name)) name="overblik";
   TABS.forEach(t=>{ $("t-"+t).hidden = t!==name; });
-  document.querySelectorAll("#tabs button").forEach(b=>{ const on=b.dataset.tab===name; b.setAttribute("aria-selected",on); b.setAttribute("role","tab"); if(on) b.scrollIntoView({block:"nearest",inline:"center"}); });
+  document.querySelectorAll("#tabs button").forEach(b=>{ const on=b.dataset.tab===name; b.setAttribute("aria-selected",on); b.setAttribute("role","tab"); });
   try{ history.replaceState(null,"","#"+name); }catch(e){}
   try{ localStorage.setItem(LS+".tab", name); }catch(e){}
 }
